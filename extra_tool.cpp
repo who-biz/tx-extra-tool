@@ -68,18 +68,21 @@ int main()
   Color::Modifier def(Color::FG_DEFAULT);
   Color::Modifier red(Color::FG_RED);
 
+bool result = false;
   std::string in;
-  std::cout << blue << "Please select formatting for tx_extra: "<< def << std::endl;
+/*  std::cout << blue << "Please select formatting for tx_extra: "<< def << std::endl;
   std::cout << blue << "Press:   " << def << cyan << "'0' for hexidecimal (default)" << def << std::endl;
   std::cout << cyan << "         '1' for an array of bytes" << def << std::endl;
   std::cout << "         Selection: "; std::cin >> in;
 
   uint8_t choice = stoi(in, nullptr, 10);
+
   bool user = choice;
 
-  if(user)
+  if(user) {
+    in = "";
     std::cout << red << "Choice not yet supported. " << def << std::endl;
-
+*/
   std::string string;
   std::cout << blue << "Enter tx_extra as hex string: " << def << std::endl;
   std::cin >> string;
@@ -97,7 +100,7 @@ int main()
   std::string fields_total = string.substr((hexcount_int+2)*2, byte_term);
   int char_count = (hexcount_int*2);
   int pubnum = (fields_total.length()/66);
-
+  int excess = string.length() - (byte_term - fields_total.length());
   int x = 1;
 
   std::cout << cyan << "Tx Extra (double-check this with above): " << std::endl << def << blue << string << def << std::endl;
@@ -107,11 +110,19 @@ int main()
   std::cout << cyan << "User-specified byte-count (in decimal): " << def << blue << hex_dec_str << def << std::endl;
   std::cout << cyan << "Bytes after extranonce cutoff: " << def << blue << fields_total << def << std::endl;
 
+  int pubnum_count = 0;
   for (x=1; x<(pubnum+1);x++) {
     int pubkeyincr = ((x-1)*66);
     int lead_tag = stoi(fields_total.substr(pubkeyincr,2), nullptr, 16);
     if (lead_tag == 1) {
-      std::cout << cyan << "Pubkey: " << def << blue << fields_total.substr(pubkeyincr,66) << def << std::endl; }
+      std::cout << cyan << "Pubkey: " << def << blue << fields_total.substr(pubkeyincr,66) << def << std::endl;
+    }
     if (lead_tag == 4) {
-      std::cout << cyan << "Pubkey additional: " << def << blue << fields_total.substr(pubkeyincr,66) << def << std::endl; } }
+      std::cout << cyan << "Pubkey additional: " << def << blue << fields_total.substr(pubkeyincr,66) << def << std::endl;
+    }
+    pubnum_count = pubkeyincr;
   }
+  std::string remainder = fields_total.substr(pubnum_count);
+  std::cout << cyan << "Remainder of extra: " << blue <<  remainder << std::endl;
+  return 0;
+}
